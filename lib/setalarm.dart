@@ -148,7 +148,9 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                           surface: Colors.grey,
                           onSurface: Colors.white,
                         ),
-                        dialogBackgroundColor: Colors.black,
+                        dialogTheme: DialogThemeData(
+                          backgroundColor: Colors.black,
+                        ),
                       ),
                       child: child!,
                     );
