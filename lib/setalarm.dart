@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'alarm.dart'; // Para acessar a classe Alarme
 
 class SetAlarmPage extends StatefulWidget {
   const SetAlarmPage({super.key});
@@ -20,7 +21,6 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
@@ -43,8 +43,12 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Aqui você pode salvar a hora e datas selecionadas
-                      Navigator.pop(context);
+                      final novoAlarme = Alarme(
+                        hora: selectedHour,
+                        minuto: selectedMinute,
+                        datas: datasSelecionadas,
+                      );
+                      Navigator.pop(context, novoAlarme);
                     },
                     child: const Text(
                       'Guardar',
@@ -54,10 +58,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
-
-            // Time picker (cupertino)
             SizedBox(
               height: 180,
               child: Row(
@@ -117,10 +118,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
-
-            // Botão de seleção de datas
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
@@ -148,7 +146,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                           surface: Colors.grey,
                           onSurface: Colors.white,
                         ),
-                        dialogTheme: DialogThemeData(
+                        dialogTheme: const DialogTheme(
                           backgroundColor: Colors.black,
                         ),
                       ),
@@ -163,10 +161,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
               },
               child: const Text('Selecionar data'),
             ),
-
             const SizedBox(height: 20),
-
-            // Chips com datas selecionadas
             Wrap(
               spacing: 8,
               runSpacing: 8,
