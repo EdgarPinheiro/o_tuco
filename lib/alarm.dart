@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'setalarm.dart';
 
 class Alarme {
@@ -13,6 +15,21 @@ class Alarme {
     required this.datas,
     this.ativo = true, // valor padrão para evitar null
   });
+
+  Map<String, dynamic> toJson() => {
+    'hora': hora,
+    'minuto': minuto,
+    'datas': datas.map((d) => d.toIso8601String()).toList(),
+    'ativo': ativo,
+  };
+
+  factory Alarme.fromJson(Map<String, dynamic> json) => Alarme(
+    hora: json['hora'],
+    minuto: json['minuto'],
+    datas:
+        List<String>.from(json['datas']).map((d) => DateTime.parse(d)).toList(),
+    ativo: json['ativo'],
+  );
 }
 
 class AlarmPage extends StatefulWidget {
@@ -24,6 +41,30 @@ class AlarmPage extends StatefulWidget {
 
 class _AlarmPageState extends State<AlarmPage> {
   List<Alarme> alarmes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarAlarmes();
+  }
+
+  Future<void> _guardarAlarmes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final listaJson = alarmes.map((a) => jsonEncode(a.toJson())).toList();
+    await prefs.setStringList('alarmes', listaJson);
+  }
+
+  Future<void> _carregarAlarmes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final listaJson = prefs.getStringList('alarmes') ?? [];
+    setState(() {
+      alarmes =
+          listaJson.map((jsonStr) {
+            final map = jsonDecode(jsonStr);
+            return Alarme.fromJson(map);
+          }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +99,7 @@ class _AlarmPageState extends State<AlarmPage> {
                     ),
                   );
                 });
+                _guardarAlarmes();
               }
             },
             icon: const Icon(Icons.add, color: Colors.orange),
@@ -111,8 +153,27 @@ class _AlarmPageState extends State<AlarmPage> {
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.orange),
                             tooltip: 'Editar',
+<<<<<<< HEAD
                             onPressed: () {
                               // lógica de edição aqui (ainda não implementada)
+=======
+                            onPressed: () async {
+                              final resultado = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          SetAlarmPage(alarmeExistente: alarme),
+                                ),
+                              );
+
+                              if (resultado != null && resultado is Alarme) {
+                                setState(() {
+                                  alarmes[index] = resultado;
+                                });
+                                _guardarAlarmes();
+                              }
+>>>>>>> 72c3166 (TUDO A FUNCIONAR (Nao manda arduino))
                             },
                           ),
                           IconButton(
@@ -128,6 +189,7 @@ class _AlarmPageState extends State<AlarmPage> {
                               setState(() {
                                 alarme.ativo = value;
                               });
+                              _guardarAlarmes();
                             },
                             activeColor: Colors.green,
                           ),
@@ -167,6 +229,7 @@ class _AlarmPageState extends State<AlarmPage> {
                 setState(() {
                   alarmes.removeAt(index);
                 });
+                _guardarAlarmes();
                 Navigator.of(context).pop();
               },
               child: const Text(

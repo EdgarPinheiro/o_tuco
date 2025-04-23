@@ -43,6 +43,18 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                   ),
                   TextButton(
                     onPressed: () {
+                      if (datasSelecionadas.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Por favor selecione pelo menos uma data.',
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       final novoAlarme = Alarme(
                         hora: selectedHour,
                         minuto: selectedMinute,
