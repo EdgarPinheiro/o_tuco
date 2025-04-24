@@ -13,7 +13,7 @@ class Alarme {
     required this.hora,
     required this.minuto,
     required this.datas,
-    this.ativo = true, // valor padrão para evitar null
+    this.ativo = true,
   });
 
   Map<String, dynamic> toJson() => {
@@ -90,14 +90,7 @@ class _AlarmPageState extends State<AlarmPage> {
 
               if (resultado != null && resultado is Alarme) {
                 setState(() {
-                  alarmes.add(
-                    Alarme(
-                      hora: resultado.hora,
-                      minuto: resultado.minuto,
-                      datas: resultado.datas,
-                      ativo: resultado.ativo, // garante bool válido
-                    ),
-                  );
+                  alarmes.add(resultado);
                 });
                 _guardarAlarmes();
               }
@@ -134,10 +127,8 @@ class _AlarmPageState extends State<AlarmPage> {
                         style: TextStyle(
                           fontSize: 24,
                           color: alarme.ativo ? Colors.white : Colors.grey,
-                          // Removido o riscado aqui
                         ),
                       ),
-
                       subtitle: Text(
                         alarme.datas
                             .map(
@@ -153,10 +144,6 @@ class _AlarmPageState extends State<AlarmPage> {
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.orange),
                             tooltip: 'Editar',
-<<<<<<< HEAD
-                            onPressed: () {
-                              // lógica de edição aqui (ainda não implementada)
-=======
                             onPressed: () async {
                               final resultado = await Navigator.push(
                                 context,
@@ -173,7 +160,6 @@ class _AlarmPageState extends State<AlarmPage> {
                                 });
                                 _guardarAlarmes();
                               }
->>>>>>> 72c3166 (TUDO A FUNCIONAR (Nao manda arduino))
                             },
                           ),
                           IconButton(

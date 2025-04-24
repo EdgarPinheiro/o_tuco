@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'alarm.dart'; // Para acessar a classe Alarme
+import 'alarm.dart';
 
 class SetAlarmPage extends StatefulWidget {
-  const SetAlarmPage({super.key});
+  final Alarme? alarmeExistente;
+
+  const SetAlarmPage({super.key, this.alarmeExistente});
 
   @override
   State<SetAlarmPage> createState() => _SetAlarmPageState();
@@ -15,12 +17,23 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
   List<DateTime> datasSelecionadas = [];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.alarmeExistente != null) {
+      selectedHour = widget.alarmeExistente!.hora;
+      selectedMinute = widget.alarmeExistente!.minuto;
+      datasSelecionadas = List.from(widget.alarmeExistente!.datas);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
           children: [
+            // Top bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
@@ -59,6 +72,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                         hora: selectedHour,
                         minuto: selectedMinute,
                         datas: datasSelecionadas,
+                        ativo: widget.alarmeExistente?.ativo ?? true,
                       );
                       Navigator.pop(context, novoAlarme);
                     },
@@ -70,7 +84,10 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 30),
+
+            // Time picker
             SizedBox(
               height: 180,
               child: Row(
@@ -130,7 +147,10 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 30),
+
+            // Botão de selecionar datas
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
@@ -138,16 +158,10 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
               ),
               onPressed: () async {
                 DateTime hoje = DateTime.now();
-                DateTime dataLimiteInferior = DateTime(
-                  hoje.year,
-                  hoje.month,
-                  hoje.day,
-                );
-
                 DateTime? novaData = await showDatePicker(
                   context: context,
-                  initialDate: dataLimiteInferior,
-                  firstDate: dataLimiteInferior,
+                  initialDate: hoje,
+                  firstDate: hoje,
                   lastDate: DateTime(2100),
                   builder: (context, child) {
                     return Theme(
@@ -173,7 +187,10 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
               },
               child: const Text('Selecionar data'),
             ),
+
             const SizedBox(height: 20),
+
+            // Chips de datas
             Wrap(
               spacing: 8,
               runSpacing: 8,
