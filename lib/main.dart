@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'alarm.dart'; // Importa a segunda página
+import 'alarm.dart';
+import 'led.dart'; // Adicione esta linha
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Aplicação Simples',
+      title: 'Aplicação',
       theme: ThemeData(colorScheme: ColorScheme.light()),
       home: const SimpleHomePage(),
     );
@@ -40,7 +41,15 @@ class SimpleHomePage extends StatelessWidget {
               child: const Text('Alarme'),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: () {}, child: const Text('Outro Botão')),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LedPage()),
+                );
+              },
+              child: const Text('Leds'),
+            ),
           ],
         ),
       ),

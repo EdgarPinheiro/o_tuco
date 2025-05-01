@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'alarm.dart';
+import 'package:http/http.dart' as http;
+import 'alarm.dart'; // Presumo que aqui tenhas a tua classe Alarme
 
 class SetAlarmPage extends StatefulWidget {
   final Alarme? alarmeExistente;
@@ -23,6 +24,45 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
       selectedHour = widget.alarmeExistente!.hora;
       selectedMinute = widget.alarmeExistente!.minuto;
       datasSelecionadas = List.from(widget.alarmeExistente!.datas);
+    }
+  }
+
+  Future<void> enviarAlarmeParaESP(
+    int hora,
+    int minuto,
+    int dia,
+    int mes,
+    int ano,
+  ) async {
+    final url = Uri.parse('http://192.168.4.1/alarme');
+
+    final Map<String, String> payload = {
+      'hora': hora.toString(),
+      'minuto': minuto.toString(),
+      'dia': dia.toString(),
+      'mes': mes.toString(),
+      'ano': ano.toString(),
+    };
+
+    try {
+      final response = await http.post(url, body: payload);
+
+      if (response.statusCode == 200) {
+        print('Alarme enviado com sucesso!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Alarme enviado com sucesso!')),
+        );
+      } else {
+        print('Erro ao enviar alarme: ${response.statusCode}');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao enviar alarme')));
+      }
+    } catch (e) {
+      print('Erro: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao conectar ao ESP32')));
     }
   }
 
@@ -55,7 +95,7 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (datasSelecionadas.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -68,12 +108,23 @@ class _SetAlarmPageState extends State<SetAlarmPage> {
                         return;
                       }
 
+                      for (var data in datasSelecionadas) {
+                        await enviarAlarmeParaESP(
+                          selectedHour,
+                          selectedMinute,
+                          data.day,
+                          data.month,
+                          data.year,
+                        );
+                      }
+
                       final novoAlarme = Alarme(
                         hora: selectedHour,
                         minuto: selectedMinute,
                         datas: datasSelecionadas,
                         ativo: widget.alarmeExistente?.ativo ?? true,
                       );
+
                       Navigator.pop(context, novoAlarme);
                     },
                     child: const Text(
